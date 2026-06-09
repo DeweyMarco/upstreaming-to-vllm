@@ -1,3 +1,22 @@
+<!-- BEGIN AWS Neuron deprecation notice -->
+> [!WARNING]
+> ## ⚠️ Deprecated / Experimental — Not Maintained
+>
+> This repository is an **experimental fork** of [vllm-project/vllm](https://github.com/vllm-project/vllm)
+> that was used to stage AWS Neuron support for upstreaming to vLLM. **It is no longer actively
+> maintained** (last functional update: Neuron SDK 2.23, mid-2025) and is provided **as-is, for
+> reference only**.
+>
+> - **Do not use this repository in production.**
+> - It will not receive feature, compatibility, or **security** updates. Known vulnerabilities in
+>   development/test-only dependencies (for example `ray`) are **not** patched
+>   here; these packages are test-scope only and are not part of any shipped runtime artifact.
+> - For current AWS Neuron + vLLM support, please follow the actively-maintained integration
+>   documented in the [AWS Neuron SDK documentation](https://awsdocs-neuron.readthedocs-hosted.com/).
+>
+> This notice is in line with AWS guidance for experimental/unmaintained public repositories.
+<!-- END AWS Neuron deprecation notice -->
+
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/vllm-project/vllm/main/docs/assets/logos/vllm-logo-text-dark.png">
