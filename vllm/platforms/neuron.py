@@ -99,7 +99,7 @@ class NeuronPlatform(Platform):
             transformers_neuronx = None
         return transformers_neuronx is not None
 
-    def get_neuron_framework_to_use(self):
+    def get_neuron_framework_to_use(self) -> NeuronFramework:
         """Return the specified framework if corresponding installations are
         available.
 
@@ -115,19 +115,35 @@ class NeuronPlatform(Platform):
         nxd_installed = self.is_neuronx_distributed_inference()
 
         specified_framework = os.environ.get("VLLM_NEURON_FRAMEWORK")
-        tnx_framework = NeuronFramework.TRANSFORMERS_NEURONX.value
-        nxd_framework = NeuronFramework.NEURONX_DISTRIBUTED_INFERENCE.value
-        if specified_framework == tnx_framework and tnx_installed:
-            return self.TRANSFORMERS_NEURONX
+        if specified_framework is not None:
+            try:
+                framework = NeuronFramework(specified_framework)
+            except ValueError as exc:
+                supported_frameworks = ", ".join(
+                    framework.value for framework in NeuronFramework)
+                raise ValueError("Invalid VLLM_NEURON_FRAMEWORK value "
+                                 f"{specified_framework!r}. Choose one of: "
+                                 f"{supported_frameworks}.") from exc
 
-        if ((specified_framework == nxd_framework and nxd_installed)
-                or (specified_framework is None and nxd_installed)):
+            framework_is_installed = {
+                NeuronFramework.TRANSFORMERS_NEURONX: tnx_installed,
+                NeuronFramework.NEURONX_DISTRIBUTED_INFERENCE: nxd_installed,
+            }
+            if not framework_is_installed[framework]:
+                raise RuntimeError(
+                    f"VLLM_NEURON_FRAMEWORK selects {framework.value!r}, "
+                    "but its Python package is not installed.")
+            return framework
+
+        if nxd_installed:
             return NeuronFramework.NEURONX_DISTRIBUTED_INFERENCE
 
-        if specified_framework is None and tnx_installed:
+        if tnx_installed:
             return NeuronFramework.TRANSFORMERS_NEURONX
 
-        return None
+        raise RuntimeError(
+            "No Neuron framework is installed. Install "
+            "neuronx-distributed-inference or transformers-neuronx.")
 
     def use_neuronx_distributed(self):
         """
